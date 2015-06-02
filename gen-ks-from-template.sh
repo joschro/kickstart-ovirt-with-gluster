@@ -17,6 +17,7 @@ OUT_FN="$2"
 read -p "Your domain: " YOURDOMAIN
 read -s -p "Your root password: " YOURPASSWD
 
+# set crypted root password:
 sed "s/^rootpw --iscrypted.*/rootpw --iscrypted $(python -c 'import crypt; print(crypt.crypt("${YOURPASSWD}", "$6$My Salt"))')/" ${IN_FN} > ${OUT_FN}
 
 sed -i "s/<your-domain>/${YOURDOMAIN}/g" ${OUT_FN}

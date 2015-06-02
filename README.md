@@ -14,6 +14,40 @@ As in the meantime oVirt 3.5.1 supports also RHEL 7 as the hosted engine OS, I c
 
 
 *Defaults*
-admin/internal network: 172.21.0.0/24
-DMZ network: 172.19.0.0/24
-public network: 192.168.178.0/24 via DHCP from my DSL router
+Networks:
+
+admin/internal network: 172.21.0.0/24 ("ovirtmgmt")
+
+DMZ network: 172.19.0.0/24 ("DMZ")
+
+public network: 192.168.178.0/24 ("Public") via DHCP from DSL router
+
+
+IPs:
+
+virtstorage: 172.21.0.99/24 (controlled by ctdb HA failover)
+
+virtmanager: 172.21.0.100/24
+
+virthost01: 172.21.0.101/24
+
+virthost02: 172.21.0.102/24
+
+virthost03: 172.21.0.103/24
+
+
+*Workflow*
+
+1. Prepare USB stick by downloading CentOS 7 ISO image (http://mirrors.kernel.org/centos/7.1.1503/isos/x86_64/CentOS-7-x86_64-Minimal-1503-01.iso or http://mirrors.kernel.org/centos/7.1.1503/isos/x86_64/CentOS-7-x86_64-Everything-1503-01.iso) and write it to the USB stick using dd (or any other tool as described in http://wiki.centos.org/HowTos/InstallFromUSBkey)
+
+2. Prepare your kickstart file with the gen-ks-from-template.sh and modify where needed (e.g. network devices); then upload it to any place that can be reached from your new server via HTTP, NFS or similar.
+
+3. Boot your server from the USB key (you may need to press F11 or F12 during BIOS startup to bring up the boot device menu) and choose "Installation" with the arrow key and then press the <TAB> key; add "ks=<URL-to-your-upload-kickstart-file" to point it to your kickstart file and press <Enter>.
+
+4. After installation has finished and server has rebooted, login with "root" and run "/root/step_1_on_virthost01_hosted-engine-deploy.sh"
+
+5. When asked, run "/root/step_1.1_on_virthost01_hosted-engine-configure.sh" in a second terminal window (switch to a new one with <Alt-F2> and login with "root" again; switch between terminals with <Alt-F1> and <Alt-F2>).
+
+6. When asked, run "/root/step_1.2_on_virtmanager_hosted-engine-setup.sh"
+
+7. 
