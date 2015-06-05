@@ -14,34 +14,27 @@ As in the meantime oVirt 3.5.1 supports also RHEL 7 as the hosted engine OS, I c
 
 
 <b>Defaults/Requirements</b><br><br>
-Physical networks:<br>
-admin/internal network: 172.21.0.0/24 ("ovirtmgmt")
+<i>Physical networks:</i><br>
+admin/internal network: 172.21.0.0/24 ("ovirtmgmt")<br>
+DMZ network: 172.19.0.0/24 ("DMZ")<br>
+public network: 192.168.178.0/24 ("Public") via DHCP from DSL router<br>
 
-DMZ network: 172.19.0.0/24 ("DMZ")
+<i>IPs:</i><br>
+virtstorage: 172.21.0.99/24 (controlled by ctdb HA failover)<br>
+virtmanager: 172.21.0.100/24<br>
+virthost01: 172.21.0.101/24<br>
+virthost02: 172.21.0.102/24<br>
+virthost03: 172.21.0.103/24<br>
 
-public network: 192.168.178.0/24 ("Public") via DHCP from DSL router
-
-
-IPs:
-
-virtstorage: 172.21.0.99/24 (controlled by ctdb HA failover)
-
-virtmanager: 172.21.0.100/24
-
-virthost01: 172.21.0.101/24
-
-virthost02: 172.21.0.102/24
-
-virthost03: 172.21.0.103/24
+<i>Storage:</i><br>
 
 
-*Workflow*
-
+<b>Installation workflow</b><br><br>
 1. Prepare USB stick by downloading CentOS 7 ISO image (http://mirrors.kernel.org/centos/7.1.1503/isos/x86_64/CentOS-7-x86_64-Minimal-1503-01.iso (636MB) or http://mirrors.kernel.org/centos/7.1.1503/isos/x86_64/CentOS-7-x86_64-Everything-1503-01.iso (7GB)) and write it to the USB stick using dd (or any other tool as described in http://wiki.centos.org/HowTos/InstallFromUSBkey)
 
 2. Prepare your kickstart file with the gen-ks-from-template.sh and modify where needed (e.g. network devices, one instead of default two harddisks etc.); then upload it to any place that can be reached from your new server via HTTP, NFS or similar.
 
-3. Boot your server from the USB key (you may need to press F11 or F12 during BIOS startup to bring up the boot device menu) and choose "Installation" with the arrow keys and then press <TAB>; add "ks=<URL-to-your-upload-kickstart-file" to the boot command line to point the installer to your kickstart file and press <Enter>.
+3. Boot your server from the USB key (you may need to press F11 or F12 during BIOS startup to bring up the boot device menu) and choose "Installation" with the arrow keys and then press <TAB>; add "ks=<URL-to-your-upload-kickstart-file" to the boot command line to point the installer to your kickstart file and press <Enter>. This will take quite some time (up to half an hour) because the installed system will be updated right after installation and the USB stick will be copied to the harddisk.
 
 4. After installation has finished and server has rebooted, you are prompted for the harddisk encryption password (1234567890); after that, login with "root" and run "/root/step_1_on_virthost01_hosted-engine-deploy.sh"
 
