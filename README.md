@@ -13,9 +13,8 @@ Since I am using my individual defaults like networks and MAC addresses, this se
 As in the meantime oVirt 3.5.1 supports also RHEL 7 as the hosted engine OS, I changed that in Jason's setup and also changed the required nodes for the gluster cluster to two instead of 3; that's because I didn't want to run several hypervisors in my celaar 24x7, but only one, which should be extended by another one for migration purposes only, namely when I want to upgrade my server to a new hardware.
 
 
-*Defaults*
-Networks:
-
+<b>Defaults/Requirements</b><br><br>
+Physical networks:<br>
 admin/internal network: 172.21.0.0/24 ("ovirtmgmt")
 
 DMZ network: 172.19.0.0/24 ("DMZ")
@@ -38,13 +37,13 @@ virthost03: 172.21.0.103/24
 
 *Workflow*
 
-1. Prepare USB stick by downloading CentOS 7 ISO image (http://mirrors.kernel.org/centos/7.1.1503/isos/x86_64/CentOS-7-x86_64-Minimal-1503-01.iso or http://mirrors.kernel.org/centos/7.1.1503/isos/x86_64/CentOS-7-x86_64-Everything-1503-01.iso) and write it to the USB stick using dd (or any other tool as described in http://wiki.centos.org/HowTos/InstallFromUSBkey)
+1. Prepare USB stick by downloading CentOS 7 ISO image (http://mirrors.kernel.org/centos/7.1.1503/isos/x86_64/CentOS-7-x86_64-Minimal-1503-01.iso (636MB) or http://mirrors.kernel.org/centos/7.1.1503/isos/x86_64/CentOS-7-x86_64-Everything-1503-01.iso (7GB)) and write it to the USB stick using dd (or any other tool as described in http://wiki.centos.org/HowTos/InstallFromUSBkey)
 
-2. Prepare your kickstart file with the gen-ks-from-template.sh and modify where needed (e.g. network devices); then upload it to any place that can be reached from your new server via HTTP, NFS or similar.
+2. Prepare your kickstart file with the gen-ks-from-template.sh and modify where needed (e.g. network devices, one instead of default two harddisks etc.); then upload it to any place that can be reached from your new server via HTTP, NFS or similar.
 
-3. Boot your server from the USB key (you may need to press F11 or F12 during BIOS startup to bring up the boot device menu) and choose "Installation" with the arrow key and then press the <TAB> key; add "ks=<URL-to-your-upload-kickstart-file" to point it to your kickstart file and press <Enter>.
+3. Boot your server from the USB key (you may need to press F11 or F12 during BIOS startup to bring up the boot device menu) and choose "Installation" with the arrow keys and then press <TAB>; add "ks=<URL-to-your-upload-kickstart-file" to the boot command line to point the installer to your kickstart file and press <Enter>.
 
-4. After installation has finished and server has rebooted, login with "root" and run "/root/step_1_on_virthost01_hosted-engine-deploy.sh"
+4. After installation has finished and server has rebooted, you are prompted for the harddisk encryption password (1234567890); after that, login with "root" and run "/root/step_1_on_virthost01_hosted-engine-deploy.sh"
 
 5. When asked, run "/root/step_1.1_on_virthost01_hosted-engine-configure.sh" in a second terminal window (switch to a new one with <Alt-F2> and login with "root" again; switch between terminals with <Alt-F1> and <Alt-F2>).
 
