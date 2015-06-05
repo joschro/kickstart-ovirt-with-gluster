@@ -30,6 +30,8 @@ virthost03: 172.21.0.103/24<br>
 
 
 <b>Installation workflow</b><br><br>
+This section describes the steps needed to set up the complete setup of hypervisor and virtualization management engine:
+
 1. Prepare USB stick by downloading CentOS 7 ISO image (http://mirrors.kernel.org/centos/7.1.1503/isos/x86_64/CentOS-7-x86_64-Minimal-1503-01.iso (636MB) or http://mirrors.kernel.org/centos/7.1.1503/isos/x86_64/CentOS-7-x86_64-Everything-1503-01.iso (7GB)) and write it to the USB stick using dd (or any other tool as described in http://wiki.centos.org/HowTos/InstallFromUSBkey)
 
 2. Prepare your kickstart file with the gen-ks-from-template.sh and modify where needed (e.g. network devices, one instead of default two harddisks etc.); then upload it to any place that can be reached from your new server via HTTP, NFS or similar.
