@@ -12,8 +12,7 @@ Since I am using my individual defaults like networks and MAC addresses, this se
 
 As in the meantime oVirt 3.5.1 supports also RHEL 7 as the hosted engine OS, I changed that in Jason's setup and also changed the required nodes for the gluster cluster to two instead of 3; that's because I didn't want to run several hypervisors in my celaar 24x7, but only one, which should be extended by another one for migration purposes only, namely when I want to upgrade my server to a new hardware.
 
-
-<b>Defaults/Requirements</b><br><br>
+<br><b>Defaults/Requirements</b><br><br>
 <i>Physical networks:</i><br>
 admin/internal network: 172.21.0.0/24 ("ovirtmgmt")<br>
 DMZ network: 172.19.0.0/24 ("DMZ")<br>
@@ -27,9 +26,21 @@ virthost02: 172.21.0.102/24<br>
 virthost03: 172.21.0.103/24<br>
 
 <i>Storage:</i><br>
+sda, sdb: 2 identical harddisks (min. 100GB) being set up as:<br>
+
+1. /boot on sda1+sdb1 with software raid (mirrored, RAID 1): 500MB
+
+2. encrypted physical volume pv.1 on sda2+sdb2 with software raid (mirrored, RAID 1): remaining disk space
+
+Filesystems:
+/ (20GB) on XFS filesystem
+/var/log (2GB) on XFS filesystem
+/gluster (50GB) on XFS filesystem
+Swap (16GB)
 
 
-<b>Installation workflow</b><br><br>
+
+<br><b>Installation workflow</b><br><br>
 This section describes the steps needed to set up the complete setup of hypervisor and virtualization management engine:
 
 1. Prepare USB stick by downloading CentOS 7 ISO image (http://mirrors.kernel.org/centos/7.1.1503/isos/x86_64/CentOS-7-x86_64-Minimal-1503-01.iso (636MB) or http://mirrors.kernel.org/centos/7.1.1503/isos/x86_64/CentOS-7-x86_64-Everything-1503-01.iso (7GB)) and write it to the USB stick using dd (or any other tool as described in http://wiki.centos.org/HowTos/InstallFromUSBkey)
@@ -38,9 +49,25 @@ This section describes the steps needed to set up the complete setup of hypervis
 
 3. Boot your server from the USB key (you may need to press F11 or F12 during BIOS startup to bring up the boot device menu) and choose "Installation" with the arrow keys and then press <TAB>; add "ks=<URL-to-your-upload-kickstart-file" to the boot command line to point the installer to your kickstart file and press <Enter>. This will take quite some time (up to half an hour) because the installed system will be updated right after installation and the USB stick will be copied to the harddisk.
 
-4. After installation has finished and server has rebooted, you are prompted for the harddisk encryption password (1234567890); after that, login with "root" and run "/root/step_1_on_virthost01_hosted-engine-deploy.sh"
+4. After installation has finished and server has rebooted, you are prompted for the harddisk encryption password (1234567890); after that, login with "root" and run "/root/step_1_on_virthost01_hosted-engine-deploy.sh" (use <TAB> for automatic name completion); confirm the follwing questions unless you want to use different installation media vor the hosted engine.
 
-5. When asked, run "/root/step_1.1_on_virthost01_hosted-engine-configure.sh" in a second terminal window (switch to a new one with <Alt-F2> and login with "root" again; switch between terminals with <Alt-F1> and <Alt-F2>).
+5. When asked by the setup tool to enter 1,2,3 or 4, use any computer connected to the 172.21.0.0/24 network (e.g. assign a static IP of 172.21.0.5 with netmask 255.255.255.0 to it) that has a VNC viewer installed (e.g. "remote-viewer" from the virt-viewer RPM package, installed with "yum install virt-viewer") to connect to the newly created hosted engine virtual machine: "remote-viewer vnc://172.21.0.101:5900". For the password, use the one mentioned by the setup tool ("...Use the temporaray password "..." to connect to the vnc console.")
+
+6. When successfully connected to the graphical installation screen of the hosted engine, press "Continue" to proceed with english as the installation language. You will be presented with an installation setup overview now; change the items in the following order:
+
+* Keyboard layout: add the layout of your choice (e.g. "German (eliminate dead keys)" with the "+" button and remove the default "English (US)" by selecting it and pressing the "-" button. Confirm with "Done" in the upper left corner.
+* Choose "Installation Destination" and confirm automatic partitiong with "Done" in the upper left corner.
+* Choose "Network & Hostname" and replace "localhost.localdomain" wwith "virtmanager.<yourdomain>" in the lower left area; then press the "Configure" button in the lower right area. Now choose the "IPv4 Settings" tab and change "Automatic (DHCP)" to "Manual"; press the "Add" button and enter "172.21.0.100" for the address, "255.255.255.0" for the Netmask and switch to the "General" tab. Check the "Automatically connect to this network when it is available" box and confirm all settings with "Save". Leave the network dialog with "Done" in the upper left corner.
+* Choose "Date & Time" and select your time zone (e.g. "Berlin") and confirm with "Done" in the upper left corner.
+
+Now that everything is set up, continue with "Begin installation" in the lower right corner. In the next dialog, choose "Root password" and confirm with "Done" in the upper left corner after entering a password twice.
+
+As soon as the installation has finished and the installation tool asks to press the "reboot" button, first head back to your terminal on the virthost01 machine and select 1 before pressing the "Reboot" button.
+
+7. Wait for the setup tool to start the hosted engine virtual machine again and run "/root/step_1.1_on_virthost01_hosted-engine-configure.sh" in a second terminal window (switch to a new one with <Alt-F2> and login with "root" again; switch between terminals with <Alt-F1> and <Alt-F2>).
+You will be prompted several times for defining a password and then entering a username and this password again; for your convenience, simply enter "ovirt" every time.
+Being asked to confirm to continue connecting, enter "yes" and press <enter>; then enter the password for the root user you defined earlier during the virtual machine installation.
+Now wait for the setup script to complete the configuration of the hosted engine virtual machine, which can take a long time (half an hour) because updates and additional packages will be installed from the internet.
 
 6. When asked, run "/root/step_1.2_on_virtmanager_hosted-engine-setup.sh"
 
